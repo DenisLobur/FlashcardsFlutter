@@ -1,0 +1,182 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../models/category.dart';
+import '../models/flashcard.dart';
+import 'auth_service.dart';
+
+class ApiService {
+  static const String baseUrl = 'http://your-api-url.com/api'; // Replace with your actual API URL
+  final AuthService _authService = AuthService();
+
+  Future<Map<String, String>> _getHeaders() async {
+    final token = await _authService.getToken();
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+  }
+
+  // Category CRUD operations
+  Future<List<Category>> getCategories() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await http.get(
+        Uri.parse('$baseUrl/categories'),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((json) => Category.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to fetch categories: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching categories: $e');
+    }
+  }
+
+  Future<Category> createCategory(String name, String description) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await http.post(
+        Uri.parse('$baseUrl/categories'),
+        headers: headers,
+        body: jsonEncode({
+          'name': name,
+          'description': description,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        return Category.fromJson(data);
+      } else {
+        throw Exception('Failed to create category: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error creating category: $e');
+    }
+  }
+
+  Future<Category> updateCategory(String id, String name, String description) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await http.put(
+        Uri.parse('$baseUrl/categories/$id'),
+        headers: headers,
+        body: jsonEncode({
+          'name': name,
+          'description': description,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return Category.fromJson(data);
+      } else {
+        throw Exception('Failed to update category: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error updating category: $e');
+    }
+  }
+
+  Future<void> deleteCategory(String id) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await http.delete(
+        Uri.parse('$baseUrl/categories/$id'),
+        headers: headers,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to delete category: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error deleting category: $e');
+    }
+  }
+
+  // Flashcard CRUD operations
+  Future<List<Flashcard>> getFlashcards(String categoryId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await http.get(
+        Uri.parse('$baseUrl/categories/$categoryId/flashcards'),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((json) => Flashcard.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to fetch flashcards: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching flashcards: $e');
+    }
+  }
+
+  Future<Flashcard> createFlashcard(String categoryId, String frontSide, String backSide) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await http.post(
+        Uri.parse('$baseUrl/categories/$categoryId/flashcards'),
+        headers: headers,
+        body: jsonEncode({
+          'frontSide': frontSide,
+          'backSide': backSide,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        return Flashcard.fromJson(data);
+      } else {
+        throw Exception('Failed to create flashcard: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error creating flashcard: $e');
+    }
+  }
+
+  Future<Flashcard> updateFlashcard(String id, String frontSide, String backSide) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await http.put(
+        Uri.parse('$baseUrl/flashcards/$id'),
+        headers: headers,
+        body: jsonEncode({
+          'frontSide': frontSide,
+          'backSide': backSide,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return Flashcard.fromJson(data);
+      } else {
+        throw Exception('Failed to update flashcard: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error updating flashcard: $e');
+    }
+  }
+
+  Future<void> deleteFlashcard(String id) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await http.delete(
+        Uri.parse('$baseUrl/flashcards/$id'),
+        headers: headers,
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to delete flashcard: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error deleting flashcard: $e');
+    }
+  }
+} 
