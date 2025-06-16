@@ -4,14 +4,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://your-api-url.com/api'; // Replace with your actual API URL
+  static const String baseUrl = 'http://10.0.2.2:8080/api/v1';
   
-  Future<User?> register(String email, String password) async {
+  Future<User?> register(String username, String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/register'),
+        Uri.parse('$baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
+          'username': username,
           'email': email,
           'password': password,
         }),
@@ -33,7 +34,7 @@ class AuthService {
   Future<User?> login(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/login'),
+        Uri.parse('$baseUrl/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': email,

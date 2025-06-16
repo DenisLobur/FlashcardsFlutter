@@ -5,7 +5,7 @@ import '../models/flashcard.dart';
 import 'auth_service.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://your-api-url.com/api'; // Replace with your actual API URL
+  static const String baseUrl = 'http://10.0.2.2:8080/api/v1'; // Replace with your actual API URL
   final AuthService _authService = AuthService();
 
   Future<Map<String, String>> _getHeaders() async {
