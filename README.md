@@ -27,10 +27,10 @@ The app expects these backend endpoints:
 ### Authentication:
 - `POST /register` - Register new user
   - Request body: `{ "username": "string", "email": "string", "password": "string" }`
-  - Response: `{ "user": { "id": "string", "username": "string", "email": "string", "token": "string" } }`
+  - Response: `{ "token": "string", "user": { "id": "string", "username": "string", "email": "string", "created_at": "string" } }`
 - `POST /login` - Login user
   - Request body: `{ "email": "string", "password": "string" }`
-  - Response: `{ "user": { "id": "string", "username": "string", "email": "string", "token": "string" } }`
+  - Response: `{ "token": "string", "user": { "id": "string", "username": "string", "email": "string", "created_at": "string" } }`
 
 ### Categories:
 - `GET /categories` - Get user's categories

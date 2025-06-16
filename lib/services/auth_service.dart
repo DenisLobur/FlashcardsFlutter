@@ -20,7 +20,7 @@ class AuthService {
 
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        final user = User.fromJson(data['user']);
+        final user = User.fromJson(data);
         await _saveUserToken(user.token);
         return user;
       } else {
@@ -44,7 +44,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final user = User.fromJson(data['user']);
+        final user = User.fromJson(data);
         await _saveUserToken(user.token);
         return user;
       } else {
