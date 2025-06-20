@@ -19,11 +19,16 @@ class AuthProvider with ChangeNotifier {
 
     try {
       final isLoggedIn = await _authService.isLoggedIn();
-      if (!isLoggedIn) {
+      if (isLoggedIn) {
+        // Restore user data from storage
+        final user = await _authService.getCurrentUser();
+        _user = user;
+      } else {
         _user = null;
       }
     } catch (e) {
       _errorMessage = e.toString();
+      _user = null;
     }
 
     _isLoading = false;

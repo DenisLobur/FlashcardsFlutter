@@ -21,7 +21,7 @@ class AuthService {
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
         final user = User.fromJson(data);
-        await _saveUserToken(user.token);
+        await _saveUser(user);
         return user;
       } else {
         throw Exception('Failed to register: ${response.body}');
@@ -45,7 +45,7 @@ class AuthService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final user = User.fromJson(data);
-        await _saveUserToken(user.token);
+        await _saveUser(user);
         return user;
       } else {
         throw Exception('Failed to login: ${response.body}');
@@ -58,6 +58,7 @@ class AuthService {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('user_token');
+    await prefs.remove('user_data');
   }
 
   Future<String?> getToken() async {
@@ -70,15 +71,37 @@ class AuthService {
     return token != null && token.isNotEmpty;
   }
 
+  Future<User?> getCurrentUser() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userDataString = prefs.getString('user_data');
+      
+      if (userDataString != null) {
+        final userData = jsonDecode(userDataString);
+        return User.fromJson(userData);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> _saveUser(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_token', user.token);
+    await prefs.setString('user_data', jsonEncode(user.toJson()));
+  }
+
   Future<void> _saveUserToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_token', token);
   }
 
-  Map<String, String> getAuthHeaders() {
+  Future<Map<String, String>> getAuthHeaders() async {
+    final token = await getToken();
     return {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${getToken()}',
+      'Authorization': 'Bearer $token',
     };
   }
 } 
