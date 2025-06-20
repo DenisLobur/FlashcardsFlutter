@@ -103,7 +103,7 @@ class ApiService {
     try {
       final headers = await _getHeaders();
       final response = await http.get(
-        Uri.parse('$baseUrl/categories/$categoryId/flashcards'),
+        Uri.parse('$baseUrl/flashcards?category_id=$categoryId'),
         headers: headers,
       );
 
@@ -122,11 +122,12 @@ class ApiService {
     try {
       final headers = await _getHeaders();
       final response = await http.post(
-        Uri.parse('$baseUrl/categories/$categoryId/flashcards'),
+        Uri.parse('$baseUrl/flashcards'),
         headers: headers,
         body: jsonEncode({
-          'frontSide': frontSide,
-          'backSide': backSide,
+          'frontside': frontSide,
+          'backside': backSide,
+          'category_id': categoryId,
         }),
       );
 

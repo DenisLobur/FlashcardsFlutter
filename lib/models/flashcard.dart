@@ -17,8 +17,8 @@ class Flashcard {
     return Flashcard(
       id: json['id'] ?? '',
       categoryId: json['categoryId'] ?? '',
-      frontSide: json['frontSide'] ?? '',
-      backSide: json['backSide'] ?? '',
+      frontSide: json['frontside'] ?? '',
+      backSide: json['backside'] ?? '',
       createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
     );
   }
@@ -27,8 +27,8 @@ class Flashcard {
     return {
       'id': id,
       'categoryId': categoryId,
-      'frontSide': frontSide,
-      'backSide': backSide,
+      'frontside': frontSide,
+      'backside': backSide,
       'createdAt': createdAt.toIso8601String(),
     };
   }
