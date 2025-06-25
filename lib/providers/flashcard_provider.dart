@@ -10,22 +10,30 @@ class FlashcardProvider with ChangeNotifier {
   List<Flashcard> _flashcards = [];
   bool _isLoading = false;
   String? _errorMessage;
+  String? _errorType; // Track what operation caused the error
 
   List<Category> get categories => _categories;
   List<Flashcard> get flashcards => _flashcards;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  String? get errorType => _errorType;
+  
+  // Helper getters for specific error types
+  bool get hasFetchCategoriesError => _errorType == 'fetchCategories';
+  bool get hasFetchFlashcardsError => _errorType == 'fetchFlashcards';
 
   // Category operations
   Future<void> fetchCategories() async {
     _isLoading = true;
     _errorMessage = null;
+    _errorType = null;
     notifyListeners();
 
     try {
       _categories = await _apiService.getCategories();
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = _getErrorMessage(e);
+      _errorType = 'fetchCategories';
     }
 
     _isLoading = false;
@@ -35,13 +43,15 @@ class FlashcardProvider with ChangeNotifier {
   Future<void> createCategory(String name, String description) async {
     _isLoading = true;
     _errorMessage = null;
+    _errorType = null;
     notifyListeners();
 
     try {
       final newCategory = await _apiService.createCategory(name, description);
-      _categories.add(newCategory);
+      _categories.insert(0, newCategory);
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = _getErrorMessage(e);
+      _errorType = 'createCategory';
     }
 
     _isLoading = false;
@@ -51,6 +61,7 @@ class FlashcardProvider with ChangeNotifier {
   Future<void> updateCategory(String id, String name, String description) async {
     _isLoading = true;
     _errorMessage = null;
+    _errorType = null;
     notifyListeners();
 
     try {
@@ -60,7 +71,8 @@ class FlashcardProvider with ChangeNotifier {
         _categories[index] = updatedCategory;
       }
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = _getErrorMessage(e);
+      _errorType = 'updateCategory';
     }
 
     _isLoading = false;
@@ -70,29 +82,54 @@ class FlashcardProvider with ChangeNotifier {
   Future<void> deleteCategory(String id) async {
     _isLoading = true;
     _errorMessage = null;
+    _errorType = null;
     notifyListeners();
 
     try {
+      // First, call the API to delete the category
       await _apiService.deleteCategory(id);
+      
+      // Only remove from list if API call succeeded (no exception thrown)
       _categories.removeWhere((category) => category.id == id);
     } catch (e) {
-      _errorMessage = e.toString();
+      // If API call fails, set error message but don't remove from list
+      _errorMessage = _getErrorMessage(e);
+      _errorType = 'deleteCategory';
     }
 
     _isLoading = false;
     notifyListeners();
   }
 
+  // Helper method to convert exceptions to user-friendly messages
+  String _getErrorMessage(Object error) {
+    if (error is CategoryNotFoundError) {
+      return error.toString();
+    } else if (error is CategoryNotEmptyError) {
+      return error.toString();
+    } else if (error is CategoryPermissionError) {
+      return error.toString();
+    } else if (error is CategoryValidationError) {
+      return error.toString();
+    } else if (error is CategoryError) {
+      return error.toString();
+    } else {
+      return error.toString();
+    }
+  }
+
   // Flashcard operations
   Future<void> fetchFlashcards(String categoryId) async {
     _isLoading = true;
     _errorMessage = null;
+    _errorType = null;
     notifyListeners();
 
     try {
       _flashcards = await _apiService.getFlashcards(categoryId);
     } catch (e) {
       _errorMessage = e.toString();
+      _errorType = 'fetchFlashcards';
     }
 
     _isLoading = false;
@@ -102,13 +139,15 @@ class FlashcardProvider with ChangeNotifier {
   Future<void> createFlashcard(String categoryId, String frontSide, String backSide) async {
     _isLoading = true;
     _errorMessage = null;
+    _errorType = null;
     notifyListeners();
 
     try {
       final newFlashcard = await _apiService.createFlashcard(categoryId, frontSide, backSide);
-      _flashcards.add(newFlashcard);
+      _flashcards.insert(0, newFlashcard);
     } catch (e) {
       _errorMessage = e.toString();
+      _errorType = 'createFlashcard';
     }
 
     _isLoading = false;
@@ -118,6 +157,7 @@ class FlashcardProvider with ChangeNotifier {
   Future<void> updateFlashcard(String id, String frontSide, String backSide) async {
     _isLoading = true;
     _errorMessage = null;
+    _errorType = null;
     notifyListeners();
 
     try {
@@ -128,6 +168,7 @@ class FlashcardProvider with ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = e.toString();
+      _errorType = 'updateFlashcard';
     }
 
     _isLoading = false;
@@ -137,13 +178,19 @@ class FlashcardProvider with ChangeNotifier {
   Future<void> deleteFlashcard(String id) async {
     _isLoading = true;
     _errorMessage = null;
+    _errorType = null;
     notifyListeners();
 
     try {
+      // First, call the API to delete the flashcard
       await _apiService.deleteFlashcard(id);
+      
+      // Only remove from list if API call succeeded (no exception thrown)
       _flashcards.removeWhere((flashcard) => flashcard.id == id);
     } catch (e) {
+      // If API call fails, set error message but don't remove from list
       _errorMessage = e.toString();
+      _errorType = 'deleteFlashcard';
     }
 
     _isLoading = false;
@@ -152,6 +199,7 @@ class FlashcardProvider with ChangeNotifier {
 
   void clearError() {
     _errorMessage = null;
+    _errorType = null;
     notifyListeners();
   }
 

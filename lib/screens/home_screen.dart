@@ -63,15 +63,52 @@ class _HomeScreenState extends State<HomeScreen> {
     if (confirmed == true && mounted) {
       final flashcardProvider = Provider.of<FlashcardProvider>(context, listen: false);
       await flashcardProvider.deleteCategory(category.id);
+      
       if (flashcardProvider.errorMessage != null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(flashcardProvider.errorMessage!),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // Check if it's a CategoryNotEmptyError to provide helpful actions
+        if (flashcardProvider.errorMessage!.contains('contains flashcards')) {
+          _showCategoryNotEmptyDialog(category);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(flashcardProvider.errorMessage!),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
       }
     }
+  }
+
+  Future<void> _showCategoryNotEmptyDialog(Category category) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Category Not Empty'),
+        content: Text(
+          'Cannot delete "${category.name}" because it contains flashcards. '
+          'Would you like to view the flashcards first?'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => FlashcardsScreen(category: category),
+                ),
+              );
+            },
+            child: const Text('View Flashcards'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -115,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (flashcardProvider.errorMessage != null) {
+          if (flashcardProvider.hasFetchCategoriesError) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

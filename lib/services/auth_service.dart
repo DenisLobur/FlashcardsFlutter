@@ -92,11 +92,6 @@ class AuthService {
     await prefs.setString('user_data', jsonEncode(user.toJson()));
   }
 
-  Future<void> _saveUserToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_token', token);
-  }
-
   Future<Map<String, String>> getAuthHeaders() async {
     final token = await getToken();
     return {

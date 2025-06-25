@@ -24,11 +24,14 @@ class ApiService {
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((json) => Category.fromJson(json)).toList();
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        throw CategoryPermissionError();
       } else {
-        throw Exception('Failed to fetch categories: ${response.body}');
+        throw CategoryError('Failed to fetch categories: ${response.body}');
       }
     } catch (e) {
-      throw Exception('Error fetching categories: $e');
+      if (e is CategoryError) rethrow;
+      throw CategoryError('Error fetching categories: $e');
     }
   }
 
@@ -47,11 +50,26 @@ class ApiService {
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
         return Category.fromJson(data);
+      } else if (response.statusCode == 400) {
+        // Try to parse validation errors
+        try {
+          final errorData = jsonDecode(response.body);
+          if (errorData is Map && errorData.containsKey('errors')) {
+            final errors = Map<String, String>.from(errorData['errors']);
+            throw CategoryValidationError(errors);
+          }
+        } catch (_) {
+          // Fallback if parsing fails
+        }
+        throw CategoryValidationError({'general': 'Invalid category data'});
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        throw CategoryPermissionError();
       } else {
-        throw Exception('Failed to create category: ${response.body}');
+        throw CategoryError('Failed to create category: ${response.body}');
       }
     } catch (e) {
-      throw Exception('Error creating category: $e');
+      if (e is CategoryError) rethrow;
+      throw CategoryError('Error creating category: $e');
     }
   }
 
@@ -70,11 +88,28 @@ class ApiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return Category.fromJson(data);
+      } else if (response.statusCode == 404) {
+        throw CategoryNotFoundError(id);
+      } else if (response.statusCode == 400) {
+        // Try to parse validation errors
+        try {
+          final errorData = jsonDecode(response.body);
+          if (errorData is Map && errorData.containsKey('errors')) {
+            final errors = Map<String, String>.from(errorData['errors']);
+            throw CategoryValidationError(errors);
+          }
+        } catch (_) {
+          // Fallback if parsing fails
+        }
+        throw CategoryValidationError({'general': 'Invalid category data'});
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        throw CategoryPermissionError();
       } else {
-        throw Exception('Failed to update category: ${response.body}');
+        throw CategoryError('Failed to update category: ${response.body}');
       }
     } catch (e) {
-      throw Exception('Error updating category: $e');
+      if (e is CategoryError) rethrow;
+      throw CategoryError('Error updating category: $e');
     }
   }
 
@@ -86,11 +121,23 @@ class ApiService {
         headers: headers,
       );
 
-      if (response.statusCode != 200) {
-        throw Exception('Failed to delete category: ${response.body}');
+      switch(response.statusCode) {
+        case 204:
+          // Successfully deleted
+          break;
+        case 400:
+          throw CategoryNotEmptyError(id);
+        case 404:
+          throw CategoryNotFoundError(id);
+        case 401:
+        case 403:
+          throw CategoryPermissionError();
+        default:
+          throw CategoryError('Failed to delete category: ${response.body}');
       }
     } catch (e) {
-      throw Exception('Error deleting category: $e');
+      if (e is CategoryError) rethrow;
+      throw CategoryError('Error deleting category: $e');
     }
   }
 
@@ -145,8 +192,8 @@ class ApiService {
         Uri.parse('$baseUrl/flashcards/$id'),
         headers: headers,
         body: jsonEncode({
-          'frontSide': frontSide,
-          'backSide': backSide,
+          'frontside': frontSide,
+          'backside': backSide,
         }),
       );
 
@@ -169,7 +216,7 @@ class ApiService {
         headers: headers,
       );
 
-      if (response.statusCode != 200) {
+      if (response.statusCode != 204) {
         throw Exception('Failed to delete flashcard: ${response.body}');
       }
     } catch (e) {
