@@ -35,7 +35,7 @@ class ApiService {
     }
   }
 
-  Future<Category> createCategory(String name, String description) async {
+  Future<Category> createCategory(String name, String description, String color) async {
     try {
       final headers = await _getHeaders();
       final response = await http.post(
@@ -44,6 +44,7 @@ class ApiService {
         body: jsonEncode({
           'name': name,
           'description': description,
+          'color': color,
         }),
       );
 
@@ -73,7 +74,7 @@ class ApiService {
     }
   }
 
-  Future<Category> updateCategory(String id, String name, String description) async {
+  Future<Category> updateCategory(String id, String name, String description, String color) async {
     try {
       final headers = await _getHeaders();
       final response = await http.put(
@@ -82,6 +83,7 @@ class ApiService {
         body: jsonEncode({
           'name': name,
           'description': description,
+          'color': color,
         }),
       );
 

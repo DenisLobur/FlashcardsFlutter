@@ -4,6 +4,7 @@ class Category {
   final String description;
   final String userId;
   final DateTime createdAt;
+  final String color;
 
   Category({
     required this.id,
@@ -11,6 +12,7 @@ class Category {
     required this.description,
     required this.userId,
     required this.createdAt,
+    required this.color,
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Category {
       description: json['description'] ?? '',
       userId: json['userId'] ?? '',
       createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      color: json['color'] ?? '#2196F3',
     );
   }
 
@@ -30,6 +33,7 @@ class Category {
       'description': description,
       'userId': userId,
       'createdAt': createdAt.toIso8601String(),
+      'color': color,
     };
   }
 }

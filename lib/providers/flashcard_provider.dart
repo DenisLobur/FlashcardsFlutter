@@ -40,14 +40,14 @@ class FlashcardProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createCategory(String name, String description) async {
+  Future<void> createCategory(String name, String description, String color) async {
     _isLoading = true;
     _errorMessage = null;
     _errorType = null;
     notifyListeners();
 
     try {
-      final newCategory = await _apiService.createCategory(name, description);
+      final newCategory = await _apiService.createCategory(name, description, color);
       _categories.insert(0, newCategory);
     } catch (e) {
       _errorMessage = _getErrorMessage(e);
@@ -58,14 +58,14 @@ class FlashcardProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateCategory(String id, String name, String description) async {
+  Future<void> updateCategory(String id, String name, String description, String color) async {
     _isLoading = true;
     _errorMessage = null;
     _errorType = null;
     notifyListeners();
 
     try {
-      final updatedCategory = await _apiService.updateCategory(id, name, description);
+      final updatedCategory = await _apiService.updateCategory(id, name, description, color);
       final index = _categories.indexWhere((category) => category.id == id);
       if (index != -1) {
         _categories[index] = updatedCategory;

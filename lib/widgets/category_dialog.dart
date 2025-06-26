@@ -19,6 +19,19 @@ class _CategoryDialogState extends State<CategoryDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  String _selectedColor = '#2196F3'; // Default blue color
+
+  // Define 8 available colors
+  final List<Map<String, dynamic>> _availableColors = [
+    {'name': 'Blue', 'value': '#2196F3', 'color': Colors.blue},
+    {'name': 'Red', 'value': '#F44336', 'color': Colors.red},
+    {'name': 'Green', 'value': '#4CAF50', 'color': Colors.green},
+    {'name': 'Orange', 'value': '#FF9800', 'color': Colors.orange},
+    {'name': 'Purple', 'value': '#9C27B0', 'color': Colors.purple},
+    {'name': 'Teal', 'value': '#009688', 'color': Colors.teal},
+    {'name': 'Pink', 'value': '#E91E63', 'color': Colors.pink},
+    {'name': 'Indigo', 'value': '#3F51B5', 'color': Colors.indigo},
+  ];
 
   @override
   void initState() {
@@ -26,6 +39,7 @@ class _CategoryDialogState extends State<CategoryDialog> {
     if (widget.category != null) {
       _nameController.text = widget.category!.name;
       _descriptionController.text = widget.category!.description;
+      _selectedColor = widget.category!.color;
     }
   }
 
@@ -46,6 +60,7 @@ class _CategoryDialogState extends State<CategoryDialog> {
           await flashcardProvider.createCategory(
             _nameController.text.trim(),
             _descriptionController.text.trim(),
+            _selectedColor,
           );
         } else {
           // Update existing category
@@ -53,6 +68,7 @@ class _CategoryDialogState extends State<CategoryDialog> {
             widget.category!.id,
             _nameController.text.trim(),
             _descriptionController.text.trim(),
+            _selectedColor,
           );
         }
 
@@ -127,6 +143,54 @@ class _CategoryDialogState extends State<CategoryDialog> {
                 }
                 return null;
               },
+            ),
+            const SizedBox(height: 16),
+            // Color selection
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Choose Color:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _availableColors.map((colorInfo) {
+                    final isSelected = _selectedColor == colorInfo['value'];
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedColor = colorInfo['value'];
+                        });
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: colorInfo['color'],
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? Colors.black : Colors.grey.shade300,
+                            width: isSelected ? 3 : 1,
+                          ),
+                        ),
+                        child: isSelected
+                            ? const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 20,
+                              )
+                            : null,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
           ],
         ),

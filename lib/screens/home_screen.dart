@@ -111,6 +111,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Color _hexToColor(String hexColor) {
+    hexColor = hexColor.replaceAll('#', '');
+    return Color(int.parse('FF$hexColor', radix: 16));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -233,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
                     leading: CircleAvatar(
-                      backgroundColor: Theme.of(context).primaryColor,
+                      backgroundColor: _hexToColor(category.color),
                       child: const Icon(
                         Icons.style,
                         color: Colors.white,
