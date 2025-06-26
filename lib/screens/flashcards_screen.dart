@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/flashcard_provider.dart';
 import '../models/category.dart';
 import '../models/flashcard.dart';
+import '../utils/color_utils.dart';
 import '../widgets/flashcard_dialog.dart';
 import '../widgets/flashcard_widget.dart';
 
@@ -72,6 +73,8 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,7 +84,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
           widget.category.name,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: ColorUtils.hexToColor(widget.category.color),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -179,7 +182,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showFlashcardDialog(),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: ColorUtils.hexToColor(widget.category.color),
         foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),

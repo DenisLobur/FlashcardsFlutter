@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/flashcard_provider.dart';
 import '../models/category.dart';
+import '../utils/color_utils.dart';
 import 'flashcards_screen.dart';
 import 'login_screen.dart';
 import '../widgets/category_dialog.dart';
@@ -111,10 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Color _hexToColor(String hexColor) {
-    hexColor = hexColor.replaceAll('#', '');
-    return Color(int.parse('FF$hexColor', radix: 16));
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
                     leading: CircleAvatar(
-                      backgroundColor: _hexToColor(category.color),
+                      backgroundColor: ColorUtils.hexToColor(category.color),
                       child: const Icon(
                         Icons.style,
                         color: Colors.white,
